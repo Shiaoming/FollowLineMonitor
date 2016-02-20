@@ -35,6 +35,9 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	SerialInit();
 	RecTextBrowserInit();
 	SendTextBrowserInit();
+
+	//串口线程初始化
+	serialthread = new SerialThread;
 }
 
 FollowLineMonitor::~FollowLineMonitor()
@@ -46,20 +49,23 @@ void FollowLineMonitor::COMStatusUpdate()
 {
 	QString tmp;
 	int tmpnum;
+	QString name;
+	qint32 baudRate;
+	QSerialPort::DataBits dataBits;
+	QSerialPort::Parity parity;
+	QSerialPort::StopBits stopBits;
 
-	my_serialport->setPortName(ui.comboBoxNum->currentText());
+	name = ui.comboBoxNum->currentText();
 
 	tmp = ui.comboBoxBps->currentText();
-	tmpnum = tmp.toInt();
-	my_serialport->setBaudRate(tmpnum);
+	baudRate = tmp.toInt();
 
 	tmp = ui.comboBoxBits->currentText();
 	tmpnum = tmp.toInt();
-	my_serialport->setDataBits((QSerialPort::DataBits)tmpnum);
+	dataBits = (QSerialPort::DataBits)tmpnum;
 
 	tmp = ui.comboBoxParity->currentIndex();
 	tmpnum = tmp.toInt();
-	QSerialPort::Parity parity;
 	switch (tmpnum)
 	{
 	case 0:
@@ -74,28 +80,28 @@ void FollowLineMonitor::COMStatusUpdate()
 	default:
 		break;
 	}
-	my_serialport->setParity(parity);
 
 	tmp = ui.comboBoxStopBit->currentIndex();
 	tmpnum = tmp.toInt();
 	if (tmpnum == 1.5)tmpnum = 3;
-	my_serialport->setStopBits((QSerialPort::StopBits)tmpnum);
+	stopBits = (QSerialPort::StopBits)tmpnum;
 
-	my_serialport->setFlowControl(QSerialPort::NoFlowControl);
+	
 
 
 
-	if (my_serialport->isOpen())
+	if (serialthread->isRunning())
 	{
 		ui.COMButton->setText(QStringLiteral("串口已关闭,点击打开串口"));
 		ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/OFF.png")));
-		my_serialport->close();
+		serialthread->terminate();
+		serialthread->wait();
 	}
 	else
 	{
 		ui.COMButton->setText(QStringLiteral("串口已打开,点击关闭串口"));
 		ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/ON.png")));
-		my_serialport->open(QIODevice::ReadWrite);
+		serialthread->start(name, baudRate, dataBits, parity,stopBits);
 
 		//timer = new QTimer(this);
 		////connect(timer, SIGNAL(timeout()), this, SLOT(updateAA()));
@@ -148,8 +154,7 @@ void FollowLineMonitor::SerialInit()
 	ui.comboBoxStopBit->addItem(StopStr.setNum(1.5));
 	ui.comboBoxStopBit->addItem(StopStr.setNum(2));
 
-	//串口对象
-	my_serialport = new QSerialPort();
+	//信号与槽连接
 	connect(ui.COMButton, SIGNAL(clicked()), this, SLOT(COMStatusUpdate()));
 	connect(ui.comboBoxNum, SIGNAL(currentIndexChanged(int)), this, SLOT(StopCOM(int)));
 	connect(ui.comboBoxBps, SIGNAL(currentIndexChanged(int)), this, SLOT(StopCOM(int)));
@@ -160,11 +165,12 @@ void FollowLineMonitor::SerialInit()
 
 void FollowLineMonitor::StopCOM(int i)
 {
-	if (my_serialport->isOpen())
+	if (serialthread->isRunning())
 	{
 		ui.COMButton->setText(QStringLiteral("串口已关闭,点击打开串口"));
 		ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/OFF.png")));
-		my_serialport->open(QIODevice::ReadWrite);
+		serialthread->terminate();
+		serialthread->wait();
 	}
 }
 

@@ -108,6 +108,8 @@ public:
         sizePolicy.setHeightForWidth(verticalSlider->sizePolicy().hasHeightForWidth());
         verticalSlider->setSizePolicy(sizePolicy);
         verticalSlider->setMaximumSize(QSize(31, 16777215));
+        verticalSlider->setMaximum(255);
+        verticalSlider->setPageStep(1);
         verticalSlider->setOrientation(Qt::Vertical);
 
         verticalLayout_2->addWidget(verticalSlider);

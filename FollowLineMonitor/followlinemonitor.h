@@ -12,6 +12,7 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QTimer>
+#include "serialthread.h"
 
 class FollowLineMonitor : public QMainWindow
 {
@@ -34,7 +35,7 @@ private:
 	QwtPlotGrid *grid;
 	QwtPlotMarker *d_marker1, *d_marker2;
 
-	QSerialPort *my_serialport;
+	
 	QByteArray requestData;
 	QTimer *timer;
 
@@ -47,6 +48,9 @@ private:
 	bool hexRec = true;
 	//16进制发送
 	bool hexSend = true;
+
+	//串口线程
+	SerialThread *serialthread;
 
 private slots:
 	void COMStatusUpdate();

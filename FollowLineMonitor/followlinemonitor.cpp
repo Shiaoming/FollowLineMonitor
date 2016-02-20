@@ -4,7 +4,8 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-
+	statusbar = statusBar();
+	setStatusBar(statusbar);
 
 	QwtPlotCanvas *canvas = new QwtPlotCanvas();
 
@@ -36,8 +37,6 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	RecTextBrowserInit();
 	SendTextBrowserInit();
 
-	//串口线程初始化
-	serialthread = new SerialThread;
 }
 
 FollowLineMonitor::~FollowLineMonitor()
@@ -47,61 +46,38 @@ FollowLineMonitor::~FollowLineMonitor()
 
 void FollowLineMonitor::COMStatusUpdate()
 {
-	QString tmp;
-	int tmpnum;
-	QString name;
-	qint32 baudRate;
-	QSerialPort::DataBits dataBits;
-	QSerialPort::Parity parity;
-	QSerialPort::StopBits stopBits;
+	//读取串口配置数据
+	currentSettings.name = ui.comboBoxNum->currentText();
+	currentSettings.baudRate = static_cast<QSerialPort::BaudRate>(
+		ui.comboBoxBps->itemData(ui.comboBoxBps->currentIndex()).toInt());
+	currentSettings.dataBits = static_cast<QSerialPort::DataBits>(
+		ui.comboBoxBits->itemData(ui.comboBoxBits->currentIndex()).toInt());
+	currentSettings.parity = static_cast<QSerialPort::Parity>(
+		ui.comboBoxParity->itemData(ui.comboBoxParity->currentIndex()).toInt());
+	currentSettings.stopBits = static_cast<QSerialPort::StopBits>(
+		ui.comboBoxStopBit->itemData(ui.comboBoxStopBit->currentIndex()).toInt());
 
-	name = ui.comboBoxNum->currentText();
-
-	tmp = ui.comboBoxBps->currentText();
-	baudRate = tmp.toInt();
-
-	tmp = ui.comboBoxBits->currentText();
-	tmpnum = tmp.toInt();
-	dataBits = (QSerialPort::DataBits)tmpnum;
-
-	tmp = ui.comboBoxParity->currentIndex();
-	tmpnum = tmp.toInt();
-	switch (tmpnum)
+	if (serialthread.isRunning())
 	{
-	case 0:
-		parity = QSerialPort::NoParity;
-		break;
-	case 1:
-		parity = QSerialPort::EvenParity;
-		break;
-	case 2:
-		parity = QSerialPort::OddParity;
-		break;
-	default:
-		break;
-	}
+		statusStr = QStringLiteral("串口已关闭！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+		statusbar->showMessage(statusStr);
 
-	tmp = ui.comboBoxStopBit->currentIndex();
-	tmpnum = tmp.toInt();
-	if (tmpnum == 1.5)tmpnum = 3;
-	stopBits = (QSerialPort::StopBits)tmpnum;
-
-	
-
-
-
-	if (serialthread->isRunning())
-	{
 		ui.COMButton->setText(QStringLiteral("串口已关闭,点击打开串口"));
 		ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/OFF.png")));
-		serialthread->terminate();
-		serialthread->wait();
+		serialthread.terminate();
+		serialthread.wait();
 	}
 	else
 	{
-		ui.COMButton->setText(QStringLiteral("串口已打开,点击关闭串口"));
-		ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/ON.png")));
-		serialthread->start(name, baudRate, dataBits, parity,stopBits);
+		if (serialthread.start(currentSettings))
+		{
+			statusStr = QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+			statusbar->showMessage(statusStr);
+
+			ui.COMButton->setText(QStringLiteral("串口已打开,点击关闭串口"));
+			ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/ON.png")));
+		}
+
 
 		//timer = new QTimer(this);
 		////connect(timer, SIGNAL(timeout()), this, SLOT(updateAA()));
@@ -109,50 +85,50 @@ void FollowLineMonitor::COMStatusUpdate()
 	}
 }
 
-void FollowLineMonitor::SerialInit()
+void FollowLineMonitor::SearchCOM()
 {
 	///串口号遍历
+	ui.comboBoxNum->clear();
 	foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
-	{
-		QSerialPort serial;
-		serial.setPort(info);
-		if (serial.open(QIODevice::ReadWrite))
-		{
-			ui.comboBoxNum->addItem(info.portName());
-			serial.close();
-		}
-	}
+		ui.comboBoxNum->addItem(info.portName());
+}
+
+void FollowLineMonitor::SerialInit()
+{
+	//搜索串口
+	SearchCOM();
+	
 	///波特率
-	QString BpsStr;
-	ui.comboBoxBps->addItem(BpsStr.setNum(1200));
-	ui.comboBoxBps->addItem(BpsStr.setNum(2400));
-	ui.comboBoxBps->addItem(BpsStr.setNum(4800));
-	ui.comboBoxBps->addItem(BpsStr.setNum(9600));
-	ui.comboBoxBps->addItem(BpsStr.setNum(19200));
-	ui.comboBoxBps->addItem(BpsStr.setNum(38400));
-	ui.comboBoxBps->addItem(BpsStr.setNum(57600));
-	ui.comboBoxBps->addItem(BpsStr.setNum(115200));
+	ui.comboBoxBps->addItem(QStringLiteral("9600"), QSerialPort::Baud1200);
+	ui.comboBoxBps->addItem(QStringLiteral("2400"), QSerialPort::Baud2400);
+	ui.comboBoxBps->addItem(QStringLiteral("4800"), QSerialPort::Baud4800);
+	ui.comboBoxBps->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
+	ui.comboBoxBps->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
+	ui.comboBoxBps->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
+	ui.comboBoxBps->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
+	ui.comboBoxBps->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
 	ui.comboBoxBps->setCurrentIndex(7);//默认显示115200
 
 	///数据位
-	QString BitsStr;
-	ui.comboBoxBits->addItem(BitsStr.setNum(5));
-	ui.comboBoxBits->addItem(BitsStr.setNum(6));
-	ui.comboBoxBits->addItem(BitsStr.setNum(7));
-	ui.comboBoxBits->addItem(BitsStr.setNum(8));
+	ui.comboBoxBits->addItem(QStringLiteral("5"), QSerialPort::Data5);
+	ui.comboBoxBits->addItem(QStringLiteral("6"), QSerialPort::Data6);
+	ui.comboBoxBits->addItem(QStringLiteral("7"), QSerialPort::Data7);
+	ui.comboBoxBits->addItem(QStringLiteral("8"), QSerialPort::Data8);
 	ui.comboBoxBits->setCurrentIndex(3);//默认显示8
 
 	//校验位
-	QString ParityStr;
-	ui.comboBoxParity->addItem(ParityStr.sprintf("None"));
-	ui.comboBoxParity->addItem(ParityStr.sprintf("Even"));
-	ui.comboBoxParity->addItem(ParityStr.sprintf("Odd"));
+	ui.comboBoxParity->addItem(QStringLiteral("None"), QSerialPort::NoParity);
+	ui.comboBoxParity->addItem(QStringLiteral("Even"), QSerialPort::EvenParity);
+	ui.comboBoxParity->addItem(QStringLiteral("Odd"), QSerialPort::OddParity);
+	ui.comboBoxParity->addItem(QStringLiteral("Mark"), QSerialPort::MarkParity);
+	ui.comboBoxParity->addItem(QStringLiteral("Space"), QSerialPort::SpaceParity);
 
-	//校验位
-	QString StopStr;
-	ui.comboBoxStopBit->addItem(StopStr.setNum(1));
-	ui.comboBoxStopBit->addItem(StopStr.setNum(1.5));
-	ui.comboBoxStopBit->addItem(StopStr.setNum(2));
+	//停止位
+	ui.comboBoxStopBit->addItem(QStringLiteral("1"), QSerialPort::OneStop);
+#ifdef Q_OS_WIN
+	ui.comboBoxStopBit->addItem(QStringLiteral("1.5"), QSerialPort::OneAndHalfStop);
+#endif
+	ui.comboBoxStopBit->addItem(QStringLiteral("2"), QSerialPort::TwoStop);
 
 	//信号与槽连接
 	connect(ui.COMButton, SIGNAL(clicked()), this, SLOT(COMStatusUpdate()));
@@ -161,44 +137,40 @@ void FollowLineMonitor::SerialInit()
 	connect(ui.comboBoxBits, SIGNAL(currentIndexChanged(int)), this, SLOT(StopCOM(int)));
 	connect(ui.comboBoxParity, SIGNAL(currentIndexChanged(int)), this, SLOT(StopCOM(int)));
 	connect(ui.comboBoxStopBit, SIGNAL(currentIndexChanged(int)), this, SLOT(StopCOM(int)));
+	connect(ui.ResearchCom, SIGNAL(clicked()), this, SLOT(SearchCOM()));
+	connect(&serialthread, SIGNAL(error(QString)), this, SLOT(ShowCOMErr(QString)));
+
+	statusStr = QStringLiteral("串口已关闭！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(0).arg(0);
+	statusbar->showMessage(statusStr);
 }
 
 void FollowLineMonitor::StopCOM(int i)
 {
-	if (serialthread->isRunning())
+	if (serialthread.isRunning())
 	{
+		statusStr = QStringLiteral("串口已关闭！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+		statusbar->showMessage(statusStr);
+
 		ui.COMButton->setText(QStringLiteral("串口已关闭,点击打开串口"));
 		ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/OFF.png")));
-		serialthread->terminate();
-		serialthread->wait();
+		serialthread.terminate();
+		serialthread.wait();
 	}
 }
 
 void FollowLineMonitor::RecTextBrowserInit()
 {
-	if (PlotFlag)
-		ui.checkBoxPlot->setChecked(true);
-	else
-		ui.checkBoxPlot->setChecked(false);
-
-	if (hexRec)
-		ui.checkBoxHexShow->setChecked(true);
-	else
-		ui.checkBoxHexShow->setChecked(false);
-
-	connect(ui.checkBoxPlot, SIGNAL(stateChanged()), this, SLOT(UpDateCheckConfig()));
-	connect(ui.checkBoxHexShow, SIGNAL(stateChanged()), this, SLOT(UpDateCheckConfig()));
+	connect(ui.checkBoxStopShow, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
+	connect(ui.checkBoxPlot, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
+	connect(ui.checkBoxHexShow, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
+	connect(ui.checkBoxHexSend, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
 	connect(ui.clearRecButton, SIGNAL(clicked()), this, SLOT(ClearRecData()));
+	connect(&serialthread, SIGNAL(recdata(QByteArray)), this, SLOT(GetRecData(QByteArray)));
 	ClearRecData();
 }
 
 void FollowLineMonitor::SendTextBrowserInit()
 {
-	if (hexSend)
-		ui.checkBoxHexSend->setChecked(true);
-	else
-		ui.checkBoxHexSend->setChecked(false);
-
 	connect(ui.checkBoxHexSend, SIGNAL(stateChanged()), this, SLOT(UpDateCheckConfig()));
 	connect(ui.clearSendButton, SIGNAL(clicked()), this, SLOT(ClearSendData()));
 	ClearSendData();
@@ -206,6 +178,8 @@ void FollowLineMonitor::SendTextBrowserInit()
 
 void FollowLineMonitor::ClearRecData()
 {
+	requestData.clear();
+	RecStrHex.clear();
 	ui.Rectext->clear();
 }
 
@@ -230,4 +204,54 @@ void FollowLineMonitor::UpDateCheckConfig()
 		hexSend = true;
 	else
 		hexSend = false;
+
+	if (ui.checkBoxStopShow->isChecked())
+		stopshow = true;
+	else
+		stopshow = false;
+}
+
+void FollowLineMonitor::ShowCOMErr(const QString &s)
+{
+	QMessageBox::critical(this, QStringLiteral("串口错误"), s);
+}
+
+void FollowLineMonitor::GetRecData(const QByteArray rec)
+{
+	//获取新的串口数据追加至末尾
+	requestData.append(rec);
+
+	//允许继续显示，若不停刷新文本对性能影响较大
+	if (!stopshow)
+	{
+		if (hexRec)
+		{
+			ToHexStr(requestData, &RecStrHex);
+			ui.Rectext->setText(RecStrHex);
+		}
+		else
+			ui.Rectext->setText(requestData);
+
+		//光标移至末尾，实现自动滚动
+		ui.Rectext->moveCursor(QTextCursor::End);
+	}
+	statusStr=QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+	statusbar->showMessage(statusStr);
+}
+
+//十六进制显示
+void FollowLineMonitor::ToHexStr(QByteArray input, QString *output)
+{
+	if (input.length() != 0)
+	{
+		QString tmpStr;
+		for (int i = 0; i < input.length(); i++)
+		{
+			if (output->size()==0)
+				tmpStr.sprintf("%2X", (unsigned char)input.at(i));
+			else
+				tmpStr.sprintf(" %2X", (unsigned char)input.at(i));
+			output->append(tmpStr);
+		}
+	}
 }

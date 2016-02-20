@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_FollowLineMonitor_t {
-    QByteArrayData data[3];
-    char stringdata[34];
+    QByteArrayData data[12];
+    char stringdata[126];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,11 +30,23 @@ struct qt_meta_stringdata_FollowLineMonitor_t {
 static const qt_meta_stringdata_FollowLineMonitor_t qt_meta_stringdata_FollowLineMonitor = {
     {
 QT_MOC_LITERAL(0, 0, 17), // "FollowLineMonitor"
-QT_MOC_LITERAL(1, 18, 14), // "COMStatuUpdate"
-QT_MOC_LITERAL(2, 33, 0) // ""
+QT_MOC_LITERAL(1, 18, 9), // "SearchCOM"
+QT_MOC_LITERAL(2, 28, 0), // ""
+QT_MOC_LITERAL(3, 29, 15), // "COMStatusUpdate"
+QT_MOC_LITERAL(4, 45, 7), // "StopCOM"
+QT_MOC_LITERAL(5, 53, 12), // "ClearRecData"
+QT_MOC_LITERAL(6, 66, 13), // "ClearSendData"
+QT_MOC_LITERAL(7, 80, 17), // "UpDateCheckConfig"
+QT_MOC_LITERAL(8, 98, 10), // "ShowCOMErr"
+QT_MOC_LITERAL(9, 109, 1), // "s"
+QT_MOC_LITERAL(10, 111, 10), // "GetRecData"
+QT_MOC_LITERAL(11, 122, 3) // "rec"
 
     },
-    "FollowLineMonitor\0COMStatuUpdate\0"
+    "FollowLineMonitor\0SearchCOM\0\0"
+    "COMStatusUpdate\0StopCOM\0ClearRecData\0"
+    "ClearSendData\0UpDateCheckConfig\0"
+    "ShowCOMErr\0s\0GetRecData\0rec"
 };
 #undef QT_MOC_LITERAL
 
@@ -44,7 +56,7 @@ static const uint qt_meta_data_FollowLineMonitor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       8,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -52,10 +64,24 @@ static const uint qt_meta_data_FollowLineMonitor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   19,    2, 0x08 /* Private */,
+       1,    0,   54,    2, 0x08 /* Private */,
+       3,    0,   55,    2, 0x08 /* Private */,
+       4,    1,   56,    2, 0x08 /* Private */,
+       5,    0,   59,    2, 0x08 /* Private */,
+       6,    0,   60,    2, 0x08 /* Private */,
+       7,    0,   61,    2, 0x08 /* Private */,
+       8,    1,   62,    2, 0x08 /* Private */,
+      10,    1,   65,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    9,
+    QMetaType::Void, QMetaType::QByteArray,   11,
 
        0        // eod
 };
@@ -65,11 +91,17 @@ void FollowLineMonitor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     if (_c == QMetaObject::InvokeMetaMethod) {
         FollowLineMonitor *_t = static_cast<FollowLineMonitor *>(_o);
         switch (_id) {
-        case 0: _t->COMStatuUpdate(); break;
+        case 0: _t->SearchCOM(); break;
+        case 1: _t->COMStatusUpdate(); break;
+        case 2: _t->StopCOM((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: _t->ClearRecData(); break;
+        case 4: _t->ClearSendData(); break;
+        case 5: _t->UpDateCheckConfig(); break;
+        case 6: _t->ShowCOMErr((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 7: _t->GetRecData((*reinterpret_cast< const QByteArray(*)>(_a[1]))); break;
         default: ;
         }
     }
-    Q_UNUSED(_a);
 }
 
 const QMetaObject FollowLineMonitor::staticMetaObject = {
@@ -97,13 +129,13 @@ int FollowLineMonitor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 8;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
+        if (_id < 8)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 1;
+        _id -= 8;
     }
     return _id;
 }

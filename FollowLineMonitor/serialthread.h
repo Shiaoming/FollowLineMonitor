@@ -3,23 +3,47 @@
 
 #include <QThread>
 #include <QtSerialPort/QSerialPort>
+#include <QTime>
+#include <qtextcursor.h>
 
 class SerialThread : public QThread
 {
 	Q_OBJECT
 
 public:
+	struct Settings {
+		QString name;
+		qint32 baudRate;
+		QString stringBaudRate;
+		QSerialPort::DataBits dataBits;
+		QString stringDataBits;
+		QSerialPort::Parity parity;
+		QString stringParity;
+		QSerialPort::StopBits stopBits;
+		QString stringStopBits;
+		QSerialPort::FlowControl flowControl;
+		QString stringFlowControl;
+		bool localEchoEnabled;
+	};
 	SerialThread();
 	~SerialThread();
 
 private:
 	QSerialPort *my_serialport;
+	QByteArray RecData;
+	QByteArray SendData;
+	ulong rx_num, tx_num;
+
+signals:
+	void error(const QString &s);
+	void recdata(const QByteArray rec);
 
 public:
 	void run();
-	void start(const QString &name, qint32 baudRate, QSerialPort::DataBits dataBits,
-		QSerialPort::Parity parity, QSerialPort::StopBits stopBits);
+	bool start(Settings);
 	void terminate();
+	ulong RxNumber();
+	ulong TxNumber();
 };
 
 #endif // SERIALTHREAD_H

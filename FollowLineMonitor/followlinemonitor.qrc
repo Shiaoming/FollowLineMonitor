@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/FollowLineMonitor">
+        <file>Resources/Qt.png</file>
+        <file>Resources/OFF.png</file>
+        <file>Resources/ON.png</file>
+        <file>Resources/boot.png</file>
+    </qresource>
+</RCC>

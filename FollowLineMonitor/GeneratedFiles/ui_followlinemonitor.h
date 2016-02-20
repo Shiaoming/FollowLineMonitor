@@ -46,16 +46,21 @@ public:
     QGroupBox *groupBox_3;
     QGridLayout *gridLayout;
     QLabel *label_5;
+    QCheckBox *checkBoxStopShow;
     QTextBrowser *Rectext;
     QCheckBox *checkBoxPlot;
     QCheckBox *checkBoxHexShow;
     QPushButton *clearRecButton;
     QLabel *label_6;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_10;
+    QLineEdit *lineEditSendTimeout;
+    QLabel *label_9;
     QTextEdit *Sendtext;
     QCheckBox *checkBoxHexSend;
     QPushButton *clearSendButton;
     QPushButton *SendButton;
-    QCheckBox *checkBoxStopShow;
+    QPushButton *pushButtonTimeSend;
     QVBoxLayout *verticalLayout;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout_2;
@@ -77,7 +82,7 @@ public:
     {
         if (FollowLineMonitorClass->objectName().isEmpty())
             FollowLineMonitorClass->setObjectName(QStringLiteral("FollowLineMonitorClass"));
-        FollowLineMonitorClass->resize(613, 515);
+        FollowLineMonitorClass->resize(613, 519);
         centralWidget = new QWidget(FollowLineMonitorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_3 = new QGridLayout(centralWidget);
@@ -145,60 +150,88 @@ public:
 
         gridLayout->addWidget(label_5, 0, 0, 1, 1);
 
+        checkBoxStopShow = new QCheckBox(groupBox_3);
+        checkBoxStopShow->setObjectName(QStringLiteral("checkBoxStopShow"));
+        checkBoxStopShow->setChecked(false);
+
+        gridLayout->addWidget(checkBoxStopShow, 0, 2, 1, 1);
+
         Rectext = new QTextBrowser(groupBox_3);
         Rectext->setObjectName(QStringLiteral("Rectext"));
-        Rectext->setReadOnly(false);
+        Rectext->setReadOnly(true);
 
-        gridLayout->addWidget(Rectext, 1, 0, 3, 1);
+        gridLayout->addWidget(Rectext, 1, 0, 3, 2);
 
         checkBoxPlot = new QCheckBox(groupBox_3);
         checkBoxPlot->setObjectName(QStringLiteral("checkBoxPlot"));
 
-        gridLayout->addWidget(checkBoxPlot, 1, 1, 1, 1);
+        gridLayout->addWidget(checkBoxPlot, 1, 2, 1, 1);
 
         checkBoxHexShow = new QCheckBox(groupBox_3);
         checkBoxHexShow->setObjectName(QStringLiteral("checkBoxHexShow"));
         checkBoxHexShow->setChecked(true);
 
-        gridLayout->addWidget(checkBoxHexShow, 2, 1, 1, 1);
+        gridLayout->addWidget(checkBoxHexShow, 2, 2, 1, 1);
 
         clearRecButton = new QPushButton(groupBox_3);
         clearRecButton->setObjectName(QStringLiteral("clearRecButton"));
 
-        gridLayout->addWidget(clearRecButton, 3, 1, 1, 1);
+        gridLayout->addWidget(clearRecButton, 3, 2, 1, 1);
 
         label_6 = new QLabel(groupBox_3);
         label_6->setObjectName(QStringLiteral("label_6"));
 
         gridLayout->addWidget(label_6, 4, 0, 1, 1);
 
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        label_10 = new QLabel(groupBox_3);
+        label_10->setObjectName(QStringLiteral("label_10"));
+
+        horizontalLayout_2->addWidget(label_10);
+
+        lineEditSendTimeout = new QLineEdit(groupBox_3);
+        lineEditSendTimeout->setObjectName(QStringLiteral("lineEditSendTimeout"));
+        lineEditSendTimeout->setMaximumSize(QSize(41, 16777215));
+
+        horizontalLayout_2->addWidget(lineEditSendTimeout);
+
+        label_9 = new QLabel(groupBox_3);
+        label_9->setObjectName(QStringLiteral("label_9"));
+        label_9->setMaximumSize(QSize(12, 20));
+
+        horizontalLayout_2->addWidget(label_9);
+
+
+        gridLayout->addLayout(horizontalLayout_2, 4, 1, 1, 1);
+
         Sendtext = new QTextEdit(groupBox_3);
         Sendtext->setObjectName(QStringLiteral("Sendtext"));
-        Sendtext->setReadOnly(true);
+        Sendtext->setReadOnly(false);
 
-        gridLayout->addWidget(Sendtext, 5, 0, 3, 1);
+        gridLayout->addWidget(Sendtext, 5, 0, 3, 2);
 
         checkBoxHexSend = new QCheckBox(groupBox_3);
         checkBoxHexSend->setObjectName(QStringLiteral("checkBoxHexSend"));
         checkBoxHexSend->setChecked(true);
 
-        gridLayout->addWidget(checkBoxHexSend, 5, 1, 1, 1);
+        gridLayout->addWidget(checkBoxHexSend, 5, 2, 1, 1);
 
         clearSendButton = new QPushButton(groupBox_3);
         clearSendButton->setObjectName(QStringLiteral("clearSendButton"));
 
-        gridLayout->addWidget(clearSendButton, 6, 1, 1, 1);
+        gridLayout->addWidget(clearSendButton, 6, 2, 1, 1);
 
         SendButton = new QPushButton(groupBox_3);
         SendButton->setObjectName(QStringLiteral("SendButton"));
 
-        gridLayout->addWidget(SendButton, 7, 1, 1, 1);
+        gridLayout->addWidget(SendButton, 7, 2, 1, 1);
 
-        checkBoxStopShow = new QCheckBox(groupBox_3);
-        checkBoxStopShow->setObjectName(QStringLiteral("checkBoxStopShow"));
-        checkBoxStopShow->setChecked(false);
+        pushButtonTimeSend = new QPushButton(groupBox_3);
+        pushButtonTimeSend->setObjectName(QStringLiteral("pushButtonTimeSend"));
 
-        gridLayout->addWidget(checkBoxStopShow, 0, 1, 1, 1);
+        gridLayout->addWidget(pushButtonTimeSend, 4, 2, 1, 1);
 
 
         gridLayout_3->addWidget(groupBox_3, 1, 0, 1, 1);
@@ -311,14 +344,28 @@ public:
         lineEdit->setPlaceholderText(QApplication::translate("FollowLineMonitorClass", "\351\230\210\345\200\274", 0));
         groupBox_3->setTitle(QApplication::translate("FollowLineMonitorClass", "\346\225\260\346\215\256\345\217\221\351\200\201\344\270\216\346\216\245\346\224\266", 0));
         label_5->setText(QApplication::translate("FollowLineMonitorClass", "\346\216\245\346\224\266\345\216\237\345\247\213\346\225\260\346\215\256\346\230\276\347\244\272\357\274\232", 0));
+        checkBoxStopShow->setText(QApplication::translate("FollowLineMonitorClass", "\345\201\234\346\255\242\346\230\276\347\244\272", 0));
         checkBoxPlot->setText(QApplication::translate("FollowLineMonitorClass", "\347\273\230\345\210\266\346\233\262\347\272\277", 0));
         checkBoxHexShow->setText(QApplication::translate("FollowLineMonitorClass", "16\350\277\233\345\210\266\346\230\276\347\244\272", 0));
         clearRecButton->setText(QApplication::translate("FollowLineMonitorClass", "\346\270\205\347\251\272\346\216\245\346\224\266\346\225\260\346\215\256", 0));
         label_6->setText(QApplication::translate("FollowLineMonitorClass", "\345\217\221\351\200\201\346\225\260\346\215\256\357\274\232", 0));
+        label_10->setText(QApplication::translate("FollowLineMonitorClass", "\345\256\232\346\227\266\345\217\221\351\200\201\346\227\266\351\227\264\357\274\232", 0));
+#ifndef QT_NO_TOOLTIP
+        lineEditSendTimeout->setToolTip(QApplication::translate("FollowLineMonitorClass", "\345\256\232\346\227\266\345\217\221\351\200\201\346\227\266\351\227\264", 0));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_ACCESSIBILITY
+        lineEditSendTimeout->setAccessibleName(QString());
+#endif // QT_NO_ACCESSIBILITY
+#ifndef QT_NO_ACCESSIBILITY
+        lineEditSendTimeout->setAccessibleDescription(QApplication::translate("FollowLineMonitorClass", "\346\227\266\351\227\264/ms", 0));
+#endif // QT_NO_ACCESSIBILITY
+        lineEditSendTimeout->setText(QApplication::translate("FollowLineMonitorClass", "1000", 0));
+        lineEditSendTimeout->setPlaceholderText(QApplication::translate("FollowLineMonitorClass", "\346\227\266\351\227\264/ms", 0));
+        label_9->setText(QApplication::translate("FollowLineMonitorClass", "ms", 0));
         checkBoxHexSend->setText(QApplication::translate("FollowLineMonitorClass", "16\350\277\233\345\210\266\345\217\221\351\200\201", 0));
         clearSendButton->setText(QApplication::translate("FollowLineMonitorClass", "\346\270\205\347\251\272\345\217\221\351\200\201\346\225\260\346\215\256", 0));
         SendButton->setText(QApplication::translate("FollowLineMonitorClass", "\345\217\221\351\200\201", 0));
-        checkBoxStopShow->setText(QApplication::translate("FollowLineMonitorClass", "\345\201\234\346\255\242\346\230\276\347\244\272", 0));
+        pushButtonTimeSend->setText(QApplication::translate("FollowLineMonitorClass", "\345\256\232\346\227\266\345\217\221\351\200\201", 0));
         groupBox_2->setTitle(QApplication::translate("FollowLineMonitorClass", "\344\270\262\345\217\243\350\256\276\347\275\256", 0));
         label->setText(QApplication::translate("FollowLineMonitorClass", "\344\270\262\345\217\243\345\217\267\357\274\232", 0));
         comboBoxNum->clear();

@@ -59,6 +59,14 @@ void FollowLineMonitor::COMStatusUpdate()
 
 	if (serialthread.isRunning())
 	{
+		//如果正在定时发送，先关闭定时器
+		if (timerrun)
+		{
+			timer->stop();
+			ui.pushButtonTimeSend->setText(QStringLiteral("定时发送"));
+			timerrun = false;
+		}
+
 		statusStr = QStringLiteral("串口已关闭！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
 		statusbar->showMessage(statusStr);
 
@@ -77,11 +85,6 @@ void FollowLineMonitor::COMStatusUpdate()
 			ui.COMButton->setText(QStringLiteral("串口已打开,点击关闭串口"));
 			ui.COMButton->setIcon(QIcon(QStringLiteral(":/FollowLineMonitor/Resources/ON.png")));
 		}
-
-
-		//timer = new QTimer(this);
-		////connect(timer, SIGNAL(timeout()), this, SLOT(updateAA()));
-		//timer->start(10);
 	}
 }
 
@@ -160,10 +163,10 @@ void FollowLineMonitor::StopCOM(int i)
 
 void FollowLineMonitor::RecTextBrowserInit()
 {
-	connect(ui.checkBoxStopShow, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
-	connect(ui.checkBoxPlot, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
-	connect(ui.checkBoxHexShow, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
-	connect(ui.checkBoxHexSend, SIGNAL(stateChanged(int)), this, SLOT(UpDateCheckConfig()));
+	connect(ui.checkBoxStopShow, SIGNAL(stateChanged(int)), this, SLOT(StopShow()));
+	connect(ui.checkBoxPlot, SIGNAL(stateChanged(int)), this, SLOT(PlotSet()));
+	connect(ui.checkBoxHexShow, SIGNAL(stateChanged(int)), this, SLOT(RecHexShow()));
+	connect(ui.checkBoxHexSend, SIGNAL(stateChanged(int)), this, SLOT(SendHexShow()));
 	connect(ui.clearRecButton, SIGNAL(clicked()), this, SLOT(ClearRecData()));
 	connect(&serialthread, SIGNAL(recdata(QByteArray)), this, SLOT(GetRecData(QByteArray)));
 	ClearRecData();
@@ -171,8 +174,13 @@ void FollowLineMonitor::RecTextBrowserInit()
 
 void FollowLineMonitor::SendTextBrowserInit()
 {
+	timerrun = false;
+	timer = new QTimer(this);
+	connect(ui.pushButtonTimeSend, SIGNAL(clicked()), this, SLOT(TimerSet()));
+	connect(timer, SIGNAL(timeout()), this, SLOT(SendData()));
 	connect(ui.checkBoxHexSend, SIGNAL(stateChanged()), this, SLOT(UpDateCheckConfig()));
 	connect(ui.clearSendButton, SIGNAL(clicked()), this, SLOT(ClearSendData()));
+	connect(ui.SendButton, SIGNAL(clicked()), this, SLOT(SendData()));
 	ClearSendData();
 }
 
@@ -185,30 +193,63 @@ void FollowLineMonitor::ClearRecData()
 
 void FollowLineMonitor::ClearSendData()
 {
+	sendarray.clear();
+	sendarrayhex.clear();
 	ui.Sendtext->clear();
 }
 
-void FollowLineMonitor::UpDateCheckConfig()
+void FollowLineMonitor::StopShow()
+{
+	if (ui.checkBoxStopShow->isChecked())
+		stopshow = true;
+	else
+		stopshow = false;
+}
+
+void FollowLineMonitor::PlotSet()
 {
 	if (ui.checkBoxPlot->isChecked())
 		PlotFlag = true;
 	else
 		PlotFlag = false;
+}
 
+void FollowLineMonitor::RecHexShow()
+{
 	if (ui.checkBoxHexShow->isChecked())
+	{
 		hexRec = true;
+		ui.Rectext->setText(RecStrHex);
+	}
 	else
+	{
 		hexRec = false;
+		ui.Rectext->setText(requestData);
+	}
+}
 
+void FollowLineMonitor::SendHexShow()
+{
+	//是否十六进制发送选择
 	if (ui.checkBoxHexSend->isChecked())
-		hexSend = true;
-	else
-		hexSend = false;
+	{
+		sendarray = ui.Sendtext->toPlainText().toLocal8Bit();
+		QString str;
+		ToHexStr(sendarray, &str);
+		sendarrayhex = str.toLocal8Bit();
 
-	if (ui.checkBoxStopShow->isChecked())
-		stopshow = true;
+		hexSend = true;
+		ui.Sendtext->setText(sendarrayhex);
+	}
 	else
-		stopshow = false;
+	{
+		sendarrayhex = ui.Sendtext->toPlainText().toLocal8Bit();
+		QString str = sendarrayhex;
+		ReverseToHexStr(str, &sendarray);
+
+		hexSend = false;
+		ui.Sendtext->setText(sendarray);
+	}
 }
 
 void FollowLineMonitor::ShowCOMErr(const QString &s)
@@ -253,5 +294,125 @@ void FollowLineMonitor::ToHexStr(QByteArray input, QString *output)
 				tmpStr.sprintf(" %2X", (unsigned char)input.at(i));
 			output->append(tmpStr);
 		}
+	}
+}
+
+void FollowLineMonitor::ReverseToHexStr(QString input, QByteArray *output)
+{
+	if (!input.isEmpty())
+	{
+		QStringList list;
+		QStringList list1;
+		//分割数据
+		list = input.split(" ");
+		//取出有效数据
+		for each (QString str in list)
+		{
+			//有效字符
+			if ((str.at(0) >= '0') && (str.at(0) <= '9')
+				|| (str.at(0) >= 'a') && (str.at(0) <= 'f')
+				|| (str.at(0) >= 'A') && (str.at(0) <= 'F'))
+			{
+				if (str.size() > 1)
+				{
+					if ((str.at(1) >= '0') && (str.at(1) <= '9')
+						|| (str.at(1) >= 'a') && (str.at(1) <= 'f')
+						|| (str.at(1) >= 'A') && (str.at(1) <= 'F'))
+					{
+						QString tmp;
+						tmp.append(str.at(0));
+						tmp.append(str.at(1));
+						tmp.toUpper();
+						list1.append(tmp);
+					}
+				}
+				else
+				{
+					QString tmp;
+					tmp.append(str.at(0));
+					tmp.toUpper();
+					list1.append(tmp);
+				}
+			}
+		}
+
+		output->clear();
+		char tmpchar;
+		//转换为数值
+		for each (QString str in list1)
+		{
+			char a0 = str.at(0).toLatin1(), a1 = 0;
+			if ((a0 >= '0') && (a0 <= '9'))
+				a0 = a0 - '0';
+			else if ((a0 >= 'A') && (a0 <= 'F'))
+				a0 = a0 - 'A' + 10;
+			else
+				a0 = a0 - 'a' + 10;
+
+			if (str.size() > 1)
+			{
+				a1 = str.at(1).toLatin1();
+				if ((a1 >= '0') && (a1 <= '9'))
+					a1 = a1 - '0';
+				else if ((a1 >= 'A') && (a1 <= 'F'))
+					a1 = a1 - 'A' + 10;
+				else
+					a1 = a1 - 'a' + 10;
+
+				tmpchar = a0 * 16 + a1;
+			}
+			else
+			{
+				tmpchar = a0;
+			}
+			output->push_back(tmpchar);
+
+		}
+	}
+}
+
+void FollowLineMonitor::SendData()
+{
+	InputStr = ui.Sendtext->toPlainText();
+
+	if (InputStr.size() == 0)
+		return;
+	else
+	{
+		if (!hexSend)//字符串发送
+		{						
+			if (serialthread.SendArray(sendarray))
+			{
+				statusStr = QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+				statusbar->showMessage(statusStr);
+			}
+		}
+		else//十六进制发送
+		{
+			ReverseToHexStr(InputStr, &sendarrayhex);
+
+			if (serialthread.SendArray(sendarrayhex))
+			{
+				statusStr = QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+				statusbar->showMessage(statusStr);
+			}
+		}
+	}
+}
+
+void FollowLineMonitor::TimerSet()
+{
+	timeout = ui.lineEditSendTimeout->text().toInt();
+	if (!timerrun)
+	{
+		timer->start(timeout);
+		ui.pushButtonTimeSend->setText(QStringLiteral("停止定时发送"));
+		timerrun = true;
+	}
+	else
+	{
+		timer->stop();
+		ui.pushButtonTimeSend->setText(QStringLiteral("定时发送"));
+		timerrun = false;
 	}
 }

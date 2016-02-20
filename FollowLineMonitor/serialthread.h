@@ -42,6 +42,7 @@ public:
 	void run();
 	bool start(Settings);
 	void terminate();
+	bool SendArray(QByteArray);
 	ulong RxNumber();
 	ulong TxNumber();
 };

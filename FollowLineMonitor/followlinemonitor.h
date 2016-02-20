@@ -29,7 +29,7 @@ private:
 	void RecTextBrowserInit();
 	void SendTextBrowserInit();
 	void ToHexStr(QByteArray, QString*);
-
+	void ReverseToHexStr(QString,QByteArray*);
 
 private:
 	Ui::FollowLineMonitorClass ui;
@@ -42,6 +42,8 @@ private:
 	
 	QByteArray requestData;
 	QTimer *timer;
+	QByteArray sendarray;
+	QByteArray sendarrayhex;
 
 	double time[255];
 	double val[255];
@@ -65,6 +67,12 @@ private:
 
 	//十六进制字符串
 	QString RecStrHex;
+	//发送框输入的字符串
+	QString InputStr;
+	//定时发送时间间隔(ms)
+	ulong timeout;
+	//定时器是否在运行
+	bool timerrun;
 
 private slots:
 	void SearchCOM();
@@ -72,9 +80,14 @@ private slots:
 	void StopCOM(int);
 	void ClearRecData();
 	void ClearSendData();
-	void UpDateCheckConfig();
+	void StopShow();
+	void PlotSet();
+	void RecHexShow();
+	void SendHexShow();
 	void ShowCOMErr(const QString &s);
 	void GetRecData(const QByteArray rec);
+	void SendData();
+	void TimerSet();
 };
 
 #endif // FOLLOWLINEMONITOR_H

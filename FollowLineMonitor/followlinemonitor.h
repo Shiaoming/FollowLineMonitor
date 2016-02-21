@@ -13,12 +13,22 @@
 #include <qwt_plot_panner.h>
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
+#include <qwt_symbol.h>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QTimer>
 #include "serialthread.h"
 #include <qmessagebox.h>
 #include <qstatusbar.h>
+
+#define FollowLine
+
+#ifdef FollowLine
+	#define ChatPlotSize	16
+#else
+	#define ChatPlotSize	2000
+#endif
+
 
 class FollowLineMonitor : public QMainWindow
 {
@@ -34,7 +44,7 @@ private:
 	void SendTextBrowserInit();
 	void ToHexStr(QByteArray, QString*);
 	void ReverseToHexStr(QString,QByteArray*);
-
+	void ChatPlotInit();
 private:
 	Ui::FollowLineMonitorClass ui;
 	//曲线   
@@ -50,12 +60,21 @@ private:
 	QTimer *timer;
 	QByteArray sendarray;
 	QByteArray sendarrayhex;
-
-	double time[2000];
-	double val[2000];
-	int timeqqq;
-	int aaa;
-	int plotnum;
+#ifndef FollowLine
+	double time[ChatPlotSize];//x轴坐标
+#endif
+	double val[ChatPlotSize];//y轴坐标
+#ifdef FollowLine
+	double valBin[2];//阈值直线
+	//曲线   
+	QwtPlotCurve * curveBin;//阈值直线
+	unsigned char buf[512];
+	unsigned int buf_pointer = 0;
+	double OpticalVals[ChatPlotSize];
+	//double OpticalValsd[ChatPlotSize];
+#endif
+	int plotcount;//计数
+	int plotnum;//当前绘制点数
 
 	//是否绘制曲线
 	bool PlotFlag = false;
@@ -98,6 +117,13 @@ private slots:
 	void GetRecData(const QByteArray rec);
 	void SendData();
 	void TimerSet();
+	void UpDateTimeOut();
+#ifdef FollowLine
+	void AccpetPlotData(double* v);
+#else
+	void AccpetPlotData(double v);
+#endif
+	void SlidervalueChanged(int);
 };
 
 #endif // FOLLOWLINEMONITOR_H

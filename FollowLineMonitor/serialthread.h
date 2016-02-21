@@ -45,6 +45,8 @@ public:
 	bool SendArray(QByteArray);
 	ulong RxNumber();
 	ulong TxNumber();
+private slots:
+	void readData();
 };
 
 #endif // SERIALTHREAD_H

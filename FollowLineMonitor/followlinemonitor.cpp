@@ -7,9 +7,23 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	statusbar = statusBar();
 	setStatusBar(statusbar);
 
+	ChatPlotInit();
+	//串口初始化配置
+	SerialInit();
+	RecTextBrowserInit();
+	SendTextBrowserInit();
+
+}
+
+void FollowLineMonitor::ChatPlotInit()
+{
 	//背景范围等设置
-	ui.qwtPlot->setCanvasBackground(QColor(45,45,48));
+	ui.qwtPlot->setCanvasBackground(QColor(45, 45, 48));
+#ifdef FollowLine
+	ui.qwtPlot->setAxisScale(QwtPlot::xBottom, 0, ChatPlotSize, 0);//x轴范围设置
+#else
 	ui.qwtPlot->setAxisAutoScale(QwtPlot::xBottom, true);
+#endif
 	ui.qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 300, 0);//y轴范围设置
 
 	//放大缩小zoomer
@@ -18,13 +32,13 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	d_zoomer[0]->setRubberBand(QwtPicker::RectRubberBand);
 	d_zoomer[0]->setRubberBandPen(QColor(Qt::green));
 	d_zoomer[0]->setTrackerMode(QwtPicker::AlwaysOff);
-	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,	Qt::RightButton, Qt::ControlModifier);
-	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,	Qt::RightButton);
+	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
+	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 	d_zoomer[0]->setEnabled(true);
 	d_zoomer[0]->zoom(0);
 
 	/*d_zoomer[1] = new QwtPlotZoomer(QwtPlot::xTop, QwtPlot::yRight,
-		ui.qwtPlot->canvas());
+	ui.qwtPlot->canvas());
 	d_zoomer[1]->setTrackerMode(QwtPicker::AlwaysOff);
 	d_zoomer[1]->setRubberBand(QwtPicker::NoRubberBand);
 	d_zoomer[1]->setMousePattern(QwtEventPattern::MouseSelect2,Qt::RightButton, Qt::ControlModifier);
@@ -47,24 +61,37 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	d_picker->setTrackerPen(QColor(Qt::white));
 	d_picker->setEnabled(true);
 
-	
-
-
 	//实例化
-	curve = new QwtPlotCurve("Acc_X");
-	curve->setPen(QColor(0,122,204));
+	curve = new QwtPlotCurve();	
+#ifdef FollowLine
+	curve->setStyle(QwtPlotCurve::Sticks);
+	curve->setSymbol( new QwtSymbol( QwtSymbol::Ellipse, Qt::yellow,QPen(Qt::blue), QSize(5, 5) ) );
+	curve->setPen(Qt::red);
+
+	//阈值直线
+	curveBin = new QwtPlotCurve();
+	curveBin->setPen(QColor(0, 122, 204));
+	curveBin->setStyle(QwtPlotCurve::Lines);
+	//加到plot，plot由IDE创建
+	curveBin->attach(ui.qwtPlot);
+#else
+	curve->setPen(QColor(0, 122, 204));
 	curve->setStyle(QwtPlotCurve::Lines);
-	
+#endif
+
 	//加到plot，plot由IDE创建
 	curve->attach(ui.qwtPlot);
+	
+	//测试用
+	double qqq[16] = { 127,179,222,248,254,237,202,154,101,52,17,0,6,32,75,127};
+	double time[ChatPlotSize];
+	for (int i = 0; i < ChatPlotSize; i++)
+		time[i] = i;
+	curve->setSamples(time, qqq, ChatPlotSize);
 
-	//串口初始化配置
-	SerialInit();
-	RecTextBrowserInit();
-	SendTextBrowserInit();
+	plotcount = 0;
 
-	timeqqq = 0;
-	aaa = 0;
+	connect(ui.verticalSlider, SIGNAL(valueChanged(int)), this, SLOT(SlidervalueChanged(int)));
 }
 
 FollowLineMonitor::~FollowLineMonitor()
@@ -204,6 +231,7 @@ void FollowLineMonitor::SendTextBrowserInit()
 {
 	timerrun = false;
 	timer = new QTimer(this);
+	connect(ui.lineEditSendTimeout, SIGNAL(editingFinished()), this, SLOT(UpDateTimeOut()));
 	connect(ui.pushButtonTimeSend, SIGNAL(clicked()), this, SLOT(TimerSet()));
 	connect(timer, SIGNAL(timeout()), this, SLOT(SendData()));
 	connect(ui.checkBoxHexSend, SIGNAL(stateChanged()), this, SLOT(UpDateCheckConfig()));
@@ -287,25 +315,41 @@ void FollowLineMonitor::ShowCOMErr(const QString &s)
 
 void FollowLineMonitor::GetRecData(const QByteArray rec)
 {
-	//获取新的串口数据追加至末尾
-	requestData.append(rec);
-
-	//允许继续显示，若不停刷新文本对性能影响较大
-	if (!stopshow)
+	if (!rec.isEmpty())
 	{
-		if (hexRec)
+		//解析数据并绘制曲线
+		for (int i = 0; i < rec.length(); i++)
+			buf[buf_pointer++ % 512] = rec.at(i);
+		if (buf_pointer%512 > 19)
 		{
-			ToHexStr(requestData, &RecStrHex);
-			ui.Rectext->setText(RecStrHex);
+			if ((buf[buf_pointer % 512 - 1] == (unsigned char)0xBB) && (buf[buf_pointer % 512 - 18] == (unsigned char)0xAA))
+			{
+				for (int i = 0; i < ChatPlotSize; i++)
+					OpticalVals[i] = buf[buf_pointer % 512 - ChatPlotSize - 1 + i];
+				AccpetPlotData(OpticalVals);
+			}
 		}
-		else
-			ui.Rectext->setText(requestData);
 
-		//光标移至末尾，实现自动滚动
-		ui.Rectext->moveCursor(QTextCursor::End);
+
+		//获取新的串口数据追加至末尾
+		requestData.append(rec);
+		//允许继续显示，若不停刷新文本对性能影响较大
+		if (!stopshow)
+		{
+			if (hexRec)
+			{
+				ToHexStr(requestData, &RecStrHex);
+				ui.Rectext->setText(RecStrHex);
+			}
+			else
+				ui.Rectext->setText(requestData);
+
+			//光标移至末尾，实现自动滚动
+			ui.Rectext->moveCursor(QTextCursor::End);
+		}
+		statusStr = QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
+		statusbar->showMessage(statusStr);
 	}
-	statusStr=QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
-	statusbar->showMessage(statusStr);
 }
 
 //十六进制显示
@@ -401,31 +445,6 @@ void FollowLineMonitor::ReverseToHexStr(QString input, QByteArray *output)
 
 void FollowLineMonitor::SendData()
 {	
-	timeqqq++;
-	if (timeqqq >= 2000)
-	{
-		aaa++;
-		//timeqqq = 0;
-
-		for (int i = 0; i < 1999-50; i++)
-		{
-			time[i] = time[i + 50];
-			val[i] = val[i + 50];
-		}
-		time[1999 - 50 + timeqqq % 50]++;
-		val[1999 - 50 + timeqqq % 50] = 100 + 100 * sin(timeqqq*6.28 / 255);
-		plotnum = 2000 - 50 + timeqqq % 50;
-	}
-	else
-	{
-		val[timeqqq] = 100 + 100 * sin(timeqqq*6.28 / 255);
-		time[timeqqq] = timeqqq;
-		plotnum = timeqqq;
-	}
-
-	//加载数据
-	curve->setSamples(time, val, plotnum);
-
 	InputStr = ui.Sendtext->toPlainText();
 
 	if (InputStr.size() == 0)
@@ -434,6 +453,7 @@ void FollowLineMonitor::SendData()
 	{
 		if (!hexSend)//字符串发送
 		{						
+			sendarray = InputStr.toLatin1();
 			if (serialthread.SendArray(sendarray))
 			{
 				statusStr = QStringLiteral("串口已打开！\t\t\t\t\t\t\t\t接收数据:%1,发送数据:%2").arg(serialthread.RxNumber()).arg(serialthread.TxNumber());
@@ -453,20 +473,86 @@ void FollowLineMonitor::SendData()
 	}
 }
 
-void FollowLineMonitor::TimerSet()
+void FollowLineMonitor::UpDateTimeOut()
 {
-	timeout = ui.lineEditSendTimeout->text().toInt();
-	if (!timerrun)
+	if (timerrun)
 	{
+		timer->stop();
+		timeout = ui.lineEditSendTimeout->text().toInt();
 		timer->start(timeout);
 		ui.pushButtonTimeSend->setText(QStringLiteral("停止定时发送"));
 		timerrun = true;
 	}
-	else
+}
+
+
+void FollowLineMonitor::TimerSet()
+{
+	if (serialthread.isRunning())
 	{
-		timer->stop();
-		ui.pushButtonTimeSend->setText(QStringLiteral("停止定时发送"));
-		timerrun = false;
+		timeout = ui.lineEditSendTimeout->text().toInt();
+		if (!timerrun)
+		{
+			timer->start(timeout);
+			ui.pushButtonTimeSend->setText(QStringLiteral("停止定时发送"));
+			timerrun = true;
+		}
+		else
+		{
+			timer->stop();
+			ui.pushButtonTimeSend->setText(QStringLiteral("启动定时发送"));
+			timerrun = false;
+		}
+	}
+	else
+		QMessageBox::critical(this, QStringLiteral("串口错误"), QStringLiteral("请先打开串口,再启动定时发送！"));
+}
+
+#ifdef FollowLine
+void FollowLineMonitor::AccpetPlotData(double* v)
+{
+	if (PlotFlag)
+	{
+		double time[ChatPlotSize];
+		for (int i = 0; i < ChatPlotSize; i++)
+			time[i] = i;
+		memcpy(val, v, ChatPlotSize*sizeof(double));
+		curve->setSamples(time, val, ChatPlotSize);
 	}
 }
 
+#else
+//向曲线上增加一个点
+void FollowLineMonitor::AccpetPlotData(double v)
+{
+	if (plotcount >= ChatPlotSize)
+	{
+		for (int i = 0; i < ChatPlotSize - 1; i++)
+		{
+			time[i] = time[i + 1];
+			val[i] = val[i + 1];
+		}
+		time[ChatPlotSize - 1]++;
+		val[ChatPlotSize - 1] = v;
+
+		plotnum = ChatPlotSize;
+	}
+	else
+	{
+		val[plotcount] = v;
+		time[plotcount] = plotcount;
+		plotnum = plotcount;
+	}
+	plotcount++;
+	//加载数据
+	curve->setSamples(time, val, plotnum);
+}
+#endif
+
+void FollowLineMonitor::SlidervalueChanged(int v)
+{
+	double time[] = { 0, 16 };
+	valBin[0] = valBin[1] = v;
+	curveBin->setSamples(time, valBin, 2);
+	ui.lineEdit->setText(tr("%1").arg(v));
+}

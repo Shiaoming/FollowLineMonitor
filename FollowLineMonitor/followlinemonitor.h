@@ -9,6 +9,10 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QTimer>
@@ -38,15 +42,20 @@ private:
 	//QwtLegend *legend;
 	QwtPlotGrid *grid;
 	QwtPlotMarker *d_marker1, *d_marker2;
-
+	QwtPlotZoomer *d_zoomer[2];
+	QwtPlotPanner *d_panner;
+	QwtPlotPicker *d_picker;
 	
 	QByteArray requestData;
 	QTimer *timer;
 	QByteArray sendarray;
 	QByteArray sendarrayhex;
 
-	double time[255];
-	double val[255];
+	double time[2000];
+	double val[2000];
+	int timeqqq;
+	int aaa;
+	int plotnum;
 
 	//是否绘制曲线
 	bool PlotFlag = false;
@@ -73,6 +82,7 @@ private:
 	ulong timeout;
 	//定时器是否在运行
 	bool timerrun;
+	
 
 private slots:
 	void SearchCOM();

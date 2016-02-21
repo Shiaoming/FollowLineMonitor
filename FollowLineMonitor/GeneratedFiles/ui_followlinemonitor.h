@@ -82,7 +82,88 @@ public:
     {
         if (FollowLineMonitorClass->objectName().isEmpty())
             FollowLineMonitorClass->setObjectName(QStringLiteral("FollowLineMonitorClass"));
-        FollowLineMonitorClass->resize(613, 519);
+        FollowLineMonitorClass->resize(613, 530);
+        QPalette palette;
+        QBrush brush(QColor(241, 241, 241, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        QBrush brush1(QColor(255, 255, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Button, brush1);
+        QBrush brush2(QColor(45, 45, 48, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Light, brush2);
+        QBrush brush3(QColor(85, 170, 0, 255));
+        brush3.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Midlight, brush3);
+        palette.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        QBrush brush4(QColor(0, 0, 255, 255));
+        brush4.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Mid, brush4);
+        QBrush brush5(QColor(255, 255, 255, 255));
+        brush5.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Text, brush5);
+        QBrush brush6(QColor(0, 151, 226, 255));
+        brush6.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::BrightText, brush6);
+        QBrush brush7(QColor(22, 22, 22, 255));
+        brush7.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::ButtonText, brush7);
+        QBrush brush8(QColor(63, 63, 70, 255));
+        brush8.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Base, brush8);
+        palette.setBrush(QPalette::Active, QPalette::Window, brush2);
+        palette.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        QBrush brush9(QColor(255, 0, 0, 255));
+        brush9.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, brush9);
+        palette.setBrush(QPalette::Active, QPalette::AlternateBase, brush1);
+        palette.setBrush(QPalette::Active, QPalette::NoRole, brush2);
+        QBrush brush10(QColor(85, 255, 0, 255));
+        brush10.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::ToolTipBase, brush10);
+        palette.setBrush(QPalette::Active, QPalette::ToolTipText, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        QBrush brush11(QColor(170, 170, 255, 255));
+        brush11.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Inactive, QPalette::Button, brush11);
+        palette.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette.setBrush(QPalette::Inactive, QPalette::Midlight, brush3);
+        palette.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        QBrush brush12(QColor(160, 160, 160, 255));
+        brush12.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Inactive, QPalette::Mid, brush12);
+        palette.setBrush(QPalette::Inactive, QPalette::Text, brush5);
+        palette.setBrush(QPalette::Inactive, QPalette::BrightText, brush6);
+        palette.setBrush(QPalette::Inactive, QPalette::ButtonText, brush7);
+        palette.setBrush(QPalette::Inactive, QPalette::Base, brush8);
+        palette.setBrush(QPalette::Inactive, QPalette::Window, brush2);
+        palette.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        QBrush brush13(QColor(0, 0, 0, 255));
+        brush13.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush13);
+        palette.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::NoRole, brush2);
+        palette.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush10);
+        palette.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Button, brush11);
+        palette.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Midlight, brush3);
+        palette.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Mid, brush12);
+        palette.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::BrightText, brush6);
+        palette.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Base, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Window, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush5);
+        palette.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::NoRole, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush10);
+        palette.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush);
+        FollowLineMonitorClass->setPalette(palette);
         centralWidget = new QWidget(FollowLineMonitorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_3 = new QGridLayout(centralWidget);
@@ -98,6 +179,13 @@ public:
         qwtPlot = new QwtPlot(groupBox);
         qwtPlot->setObjectName(QStringLiteral("qwtPlot"));
         qwtPlot->setMinimumSize(QSize(0, 240));
+        QPalette palette1;
+        palette1.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette1.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        QBrush brush14(QColor(120, 120, 120, 255));
+        brush14.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Disabled, QPalette::Text, brush14);
+        qwtPlot->setPalette(palette1);
         qwtPlot->setAutoReplot(true);
 
         horizontalLayout->addWidget(qwtPlot);
@@ -127,6 +215,11 @@ public:
         sizePolicy1.setHeightForWidth(lineEdit->sizePolicy().hasHeightForWidth());
         lineEdit->setSizePolicy(sizePolicy1);
         lineEdit->setMaximumSize(QSize(31, 16777215));
+        QPalette palette2;
+        palette2.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette2.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette2.setBrush(QPalette::Disabled, QPalette::Text, brush14);
+        lineEdit->setPalette(palette2);
         lineEdit->setMouseTracking(false);
         lineEdit->setFrame(true);
         lineEdit->setAlignment(Qt::AlignCenter);
@@ -158,6 +251,14 @@ public:
 
         Rectext = new QTextBrowser(groupBox_3);
         Rectext->setObjectName(QStringLiteral("Rectext"));
+        QPalette palette3;
+        palette3.setBrush(QPalette::Active, QPalette::Button, brush8);
+        palette3.setBrush(QPalette::Active, QPalette::ButtonText, brush5);
+        palette3.setBrush(QPalette::Inactive, QPalette::Button, brush8);
+        palette3.setBrush(QPalette::Inactive, QPalette::ButtonText, brush5);
+        palette3.setBrush(QPalette::Disabled, QPalette::Button, brush8);
+        palette3.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        Rectext->setPalette(palette3);
         Rectext->setReadOnly(true);
 
         gridLayout->addWidget(Rectext, 1, 0, 3, 2);
@@ -194,6 +295,11 @@ public:
         lineEditSendTimeout = new QLineEdit(groupBox_3);
         lineEditSendTimeout->setObjectName(QStringLiteral("lineEditSendTimeout"));
         lineEditSendTimeout->setMaximumSize(QSize(41, 16777215));
+        QPalette palette4;
+        palette4.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette4.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette4.setBrush(QPalette::Disabled, QPalette::Text, brush14);
+        lineEditSendTimeout->setPalette(palette4);
 
         horizontalLayout_2->addWidget(lineEditSendTimeout);
 
@@ -253,6 +359,27 @@ public:
         comboBoxNum = new QComboBox(groupBox_2);
         comboBoxNum->setObjectName(QStringLiteral("comboBoxNum"));
         comboBoxNum->setMaximumSize(QSize(51, 16777215));
+        QPalette palette5;
+        palette5.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette5.setBrush(QPalette::Active, QPalette::ButtonText, brush13);
+        QBrush brush15(QColor(225, 225, 225, 255));
+        brush15.setStyle(Qt::SolidPattern);
+        palette5.setBrush(QPalette::Active, QPalette::Base, brush15);
+        palette5.setBrush(QPalette::Active, QPalette::HighlightedText, brush13);
+        QBrush brush16(QColor(170, 85, 127, 255));
+        brush16.setStyle(Qt::SolidPattern);
+        palette5.setBrush(QPalette::Active, QPalette::ToolTipText, brush16);
+        palette5.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette5.setBrush(QPalette::Inactive, QPalette::ButtonText, brush13);
+        palette5.setBrush(QPalette::Inactive, QPalette::Base, brush15);
+        palette5.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush13);
+        palette5.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush16);
+        palette5.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette5.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette5.setBrush(QPalette::Disabled, QPalette::Base, brush2);
+        palette5.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush13);
+        palette5.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush16);
+        comboBoxNum->setPalette(palette5);
 
         gridLayout_2->addWidget(comboBoxNum, 0, 1, 1, 1);
 
@@ -268,6 +395,23 @@ public:
 
         comboBoxBps = new QComboBox(groupBox_2);
         comboBoxBps->setObjectName(QStringLiteral("comboBoxBps"));
+        QPalette palette6;
+        palette6.setBrush(QPalette::Active, QPalette::Button, brush8);
+        palette6.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette6.setBrush(QPalette::Active, QPalette::ButtonText, brush13);
+        palette6.setBrush(QPalette::Active, QPalette::Base, brush15);
+        palette6.setBrush(QPalette::Active, QPalette::HighlightedText, brush13);
+        palette6.setBrush(QPalette::Inactive, QPalette::Button, brush8);
+        palette6.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette6.setBrush(QPalette::Inactive, QPalette::ButtonText, brush13);
+        palette6.setBrush(QPalette::Inactive, QPalette::Base, brush15);
+        palette6.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush13);
+        palette6.setBrush(QPalette::Disabled, QPalette::Button, brush8);
+        palette6.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette6.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette6.setBrush(QPalette::Disabled, QPalette::Base, brush2);
+        palette6.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush13);
+        comboBoxBps->setPalette(palette6);
 
         gridLayout_2->addWidget(comboBoxBps, 1, 1, 1, 2);
 
@@ -278,6 +422,23 @@ public:
 
         comboBoxBits = new QComboBox(groupBox_2);
         comboBoxBits->setObjectName(QStringLiteral("comboBoxBits"));
+        QPalette palette7;
+        palette7.setBrush(QPalette::Active, QPalette::Button, brush8);
+        palette7.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette7.setBrush(QPalette::Active, QPalette::ButtonText, brush13);
+        palette7.setBrush(QPalette::Active, QPalette::Base, brush15);
+        palette7.setBrush(QPalette::Active, QPalette::HighlightedText, brush13);
+        palette7.setBrush(QPalette::Inactive, QPalette::Button, brush8);
+        palette7.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette7.setBrush(QPalette::Inactive, QPalette::ButtonText, brush13);
+        palette7.setBrush(QPalette::Inactive, QPalette::Base, brush15);
+        palette7.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush13);
+        palette7.setBrush(QPalette::Disabled, QPalette::Button, brush8);
+        palette7.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette7.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette7.setBrush(QPalette::Disabled, QPalette::Base, brush2);
+        palette7.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush13);
+        comboBoxBits->setPalette(palette7);
 
         gridLayout_2->addWidget(comboBoxBits, 2, 1, 1, 2);
 
@@ -288,6 +449,23 @@ public:
 
         comboBoxParity = new QComboBox(groupBox_2);
         comboBoxParity->setObjectName(QStringLiteral("comboBoxParity"));
+        QPalette palette8;
+        palette8.setBrush(QPalette::Active, QPalette::Button, brush8);
+        palette8.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette8.setBrush(QPalette::Active, QPalette::ButtonText, brush13);
+        palette8.setBrush(QPalette::Active, QPalette::Base, brush15);
+        palette8.setBrush(QPalette::Active, QPalette::HighlightedText, brush13);
+        palette8.setBrush(QPalette::Inactive, QPalette::Button, brush8);
+        palette8.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette8.setBrush(QPalette::Inactive, QPalette::ButtonText, brush13);
+        palette8.setBrush(QPalette::Inactive, QPalette::Base, brush15);
+        palette8.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush13);
+        palette8.setBrush(QPalette::Disabled, QPalette::Button, brush8);
+        palette8.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette8.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette8.setBrush(QPalette::Disabled, QPalette::Base, brush2);
+        palette8.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush13);
+        comboBoxParity->setPalette(palette8);
 
         gridLayout_2->addWidget(comboBoxParity, 3, 1, 1, 2);
 
@@ -298,11 +476,39 @@ public:
 
         comboBoxStopBit = new QComboBox(groupBox_2);
         comboBoxStopBit->setObjectName(QStringLiteral("comboBoxStopBit"));
+        QPalette palette9;
+        palette9.setBrush(QPalette::Active, QPalette::Button, brush8);
+        palette9.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette9.setBrush(QPalette::Active, QPalette::ButtonText, brush13);
+        palette9.setBrush(QPalette::Active, QPalette::Base, brush15);
+        palette9.setBrush(QPalette::Active, QPalette::HighlightedText, brush13);
+        palette9.setBrush(QPalette::Inactive, QPalette::Button, brush8);
+        palette9.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette9.setBrush(QPalette::Inactive, QPalette::ButtonText, brush13);
+        palette9.setBrush(QPalette::Inactive, QPalette::Base, brush15);
+        palette9.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush13);
+        palette9.setBrush(QPalette::Disabled, QPalette::Button, brush8);
+        palette9.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette9.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette9.setBrush(QPalette::Disabled, QPalette::Base, brush2);
+        palette9.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush13);
+        comboBoxStopBit->setPalette(palette9);
 
         gridLayout_2->addWidget(comboBoxStopBit, 4, 1, 1, 2);
 
         COMButton = new QPushButton(groupBox_2);
         COMButton->setObjectName(QStringLiteral("COMButton"));
+        QPalette palette10;
+        palette10.setBrush(QPalette::Active, QPalette::Button, brush8);
+        palette10.setBrush(QPalette::Active, QPalette::Text, brush13);
+        palette10.setBrush(QPalette::Active, QPalette::ButtonText, brush13);
+        palette10.setBrush(QPalette::Inactive, QPalette::Button, brush8);
+        palette10.setBrush(QPalette::Inactive, QPalette::Text, brush13);
+        palette10.setBrush(QPalette::Inactive, QPalette::ButtonText, brush13);
+        palette10.setBrush(QPalette::Disabled, QPalette::Button, brush8);
+        palette10.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette10.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        COMButton->setPalette(palette10);
         QIcon icon;
         icon.addFile(QStringLiteral(":/FollowLineMonitor/Resources/OFF.png"), QSize(), QIcon::Normal, QIcon::Off);
         COMButton->setIcon(icon);
@@ -314,6 +520,24 @@ public:
 
         label_8 = new QLabel(centralWidget);
         label_8->setObjectName(QStringLiteral("label_8"));
+        QPalette palette11;
+        QBrush brush17(QColor(0, 170, 255, 255));
+        brush17.setStyle(Qt::SolidPattern);
+        palette11.setBrush(QPalette::Active, QPalette::WindowText, brush17);
+        QBrush brush18(QColor(0, 85, 255, 255));
+        brush18.setStyle(Qt::SolidPattern);
+        palette11.setBrush(QPalette::Active, QPalette::Text, brush18);
+        palette11.setBrush(QPalette::Active, QPalette::ButtonText, brush17);
+        palette11.setBrush(QPalette::Active, QPalette::ToolTipText, brush17);
+        palette11.setBrush(QPalette::Inactive, QPalette::WindowText, brush17);
+        palette11.setBrush(QPalette::Inactive, QPalette::Text, brush18);
+        palette11.setBrush(QPalette::Inactive, QPalette::ButtonText, brush17);
+        palette11.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush17);
+        palette11.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette11.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette11.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette11.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush17);
+        label_8->setPalette(palette11);
         QFont font;
         font.setFamily(QStringLiteral("Mistral"));
         font.setPointSize(14);
@@ -365,7 +589,7 @@ public:
         checkBoxHexSend->setText(QApplication::translate("FollowLineMonitorClass", "16\350\277\233\345\210\266\345\217\221\351\200\201", 0));
         clearSendButton->setText(QApplication::translate("FollowLineMonitorClass", "\346\270\205\347\251\272\345\217\221\351\200\201\346\225\260\346\215\256", 0));
         SendButton->setText(QApplication::translate("FollowLineMonitorClass", "\345\217\221\351\200\201", 0));
-        pushButtonTimeSend->setText(QApplication::translate("FollowLineMonitorClass", "\345\256\232\346\227\266\345\217\221\351\200\201", 0));
+        pushButtonTimeSend->setText(QApplication::translate("FollowLineMonitorClass", "\345\220\257\345\212\250\345\256\232\346\227\266\345\217\221\351\200\201", 0));
         groupBox_2->setTitle(QApplication::translate("FollowLineMonitorClass", "\344\270\262\345\217\243\350\256\276\347\275\256", 0));
         label->setText(QApplication::translate("FollowLineMonitorClass", "\344\270\262\345\217\243\345\217\267\357\274\232", 0));
         comboBoxNum->clear();

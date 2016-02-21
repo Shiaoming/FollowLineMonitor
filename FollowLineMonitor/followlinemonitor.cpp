@@ -7,28 +7,54 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	statusbar = statusBar();
 	setStatusBar(statusbar);
 
-	QwtPlotCanvas *canvas = new QwtPlotCanvas();
+	//背景范围等设置
+	ui.qwtPlot->setCanvasBackground(QColor(45,45,48));
+	ui.qwtPlot->setAxisAutoScale(QwtPlot::xBottom, true);
+	ui.qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 300, 0);//y轴范围设置
 
-	canvas->setBorderRadius(10);
+	//放大缩小zoomer
+	d_zoomer[0] = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft,
+		ui.qwtPlot->canvas());
+	d_zoomer[0]->setRubberBand(QwtPicker::RectRubberBand);
+	d_zoomer[0]->setRubberBandPen(QColor(Qt::green));
+	d_zoomer[0]->setTrackerMode(QwtPicker::AlwaysOff);
+	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,	Qt::RightButton, Qt::ControlModifier);
+	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,	Qt::RightButton);
+	d_zoomer[0]->setEnabled(true);
+	d_zoomer[0]->zoom(0);
 
+	/*d_zoomer[1] = new QwtPlotZoomer(QwtPlot::xTop, QwtPlot::yRight,
+		ui.qwtPlot->canvas());
+	d_zoomer[1]->setTrackerMode(QwtPicker::AlwaysOff);
+	d_zoomer[1]->setRubberBand(QwtPicker::NoRubberBand);
+	d_zoomer[1]->setMousePattern(QwtEventPattern::MouseSelect2,Qt::RightButton, Qt::ControlModifier);
+	d_zoomer[1]->setMousePattern(QwtEventPattern::MouseSelect3,Qt::RightButton);
+	d_zoomer[1]->setEnabled(true);
+	d_zoomer[1]->zoom(0);*/
 
+	//拖动panner
+	d_panner = new QwtPlotPanner(ui.qwtPlot->canvas());
+	d_panner->setMouseButton(Qt::MidButton);
+	d_panner->setEnabled(true);
 
-	for (int i = 0; i < 255; i++)
-	{
-		time[i] = i;
-		val[i] = i;
-	}
+	//坐标读取picker
+	d_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
+		QwtPlotPicker::CrossRubberBand, QwtPicker::AlwaysOn,
+		ui.qwtPlot->canvas());
+	d_picker->setStateMachine(new QwtPickerDragPointMachine());
+	d_picker->setRubberBandPen(QColor(Qt::green));
+	d_picker->setRubberBand(QwtPicker::NoRubberBand);
+	d_picker->setTrackerPen(QColor(Qt::white));
+	d_picker->setEnabled(true);
 
-	ui.setupUi(this);
+	
+
 
 	//实例化
 	curve = new QwtPlotCurve("Acc_X");
-	curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-	curve->setPen(Qt::darkGreen, 1);
-	curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
-	curve->setYAxis(QwtPlot::yLeft);
-	//加载数据
-	curve->setSamples(time, val, 255);
+	curve->setPen(QColor(0,122,204));
+	curve->setStyle(QwtPlotCurve::Lines);
+	
 	//加到plot，plot由IDE创建
 	curve->attach(ui.qwtPlot);
 
@@ -37,6 +63,8 @@ FollowLineMonitor::FollowLineMonitor(QWidget *parent)
 	RecTextBrowserInit();
 	SendTextBrowserInit();
 
+	timeqqq = 0;
+	aaa = 0;
 }
 
 FollowLineMonitor::~FollowLineMonitor()
@@ -63,7 +91,7 @@ void FollowLineMonitor::COMStatusUpdate()
 		if (timerrun)
 		{
 			timer->stop();
-			ui.pushButtonTimeSend->setText(QStringLiteral("定时发送"));
+			ui.pushButtonTimeSend->setText(QStringLiteral("启动定时发送"));
 			timerrun = false;
 		}
 
@@ -372,7 +400,32 @@ void FollowLineMonitor::ReverseToHexStr(QString input, QByteArray *output)
 }
 
 void FollowLineMonitor::SendData()
-{
+{	
+	timeqqq++;
+	if (timeqqq >= 2000)
+	{
+		aaa++;
+		//timeqqq = 0;
+
+		for (int i = 0; i < 1999-50; i++)
+		{
+			time[i] = time[i + 50];
+			val[i] = val[i + 50];
+		}
+		time[1999 - 50 + timeqqq % 50]++;
+		val[1999 - 50 + timeqqq % 50] = 100 + 100 * sin(timeqqq*6.28 / 255);
+		plotnum = 2000 - 50 + timeqqq % 50;
+	}
+	else
+	{
+		val[timeqqq] = 100 + 100 * sin(timeqqq*6.28 / 255);
+		time[timeqqq] = timeqqq;
+		plotnum = timeqqq;
+	}
+
+	//加载数据
+	curve->setSamples(time, val, plotnum);
+
 	InputStr = ui.Sendtext->toPlainText();
 
 	if (InputStr.size() == 0)
@@ -412,7 +465,8 @@ void FollowLineMonitor::TimerSet()
 	else
 	{
 		timer->stop();
-		ui.pushButtonTimeSend->setText(QStringLiteral("定时发送"));
+		ui.pushButtonTimeSend->setText(QStringLiteral("停止定时发送"));
 		timerrun = false;
 	}
 }
+
